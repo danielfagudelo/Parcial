@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Parcial.Shared\Parcial.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

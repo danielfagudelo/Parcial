@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parcial.Shared", "Parcial.Shared\Parcial.Shared.csproj", "{652CE812-8DCC-4009-BEDF-16C569241C9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parcial.Shared", "Parcial.Shared\Parcial.Shared.csproj", "{652CE812-8DCC-4009-BEDF-16C569241C9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parcial.API", "Parcial.API\Parcial.API.csproj", "{4FCD901A-EFB9-4B3E-A50F-62652D5CEBBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parcial.API", "Parcial.API\Parcial.API.csproj", "{4FCD901A-EFB9-4B3E-A50F-62652D5CEBBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parcial.Web", "Parcial.Web\Parcial.Web.csproj", "{95DF55DA-2175-4202-A8DC-C9F1B3BA517B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parcial.Web", "Parcial.Web\Parcial.Web.csproj", "{95DF55DA-2175-4202-A8DC-C9F1B3BA517B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

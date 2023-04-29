@@ -1,19 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sales.Shared.Entities;
+using Parcial.Shared.Entities;
 
-namespace Sales.API.Data
+namespace Parcial.API.Data
 {
     public class DataContext : DbContext
     {
+       
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
+
         }
-        public DbSet<Country> Countries { get; set; }
+        public DbSet<Boleta>Boletas{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Country>().HasIndex(c => c.Name).IsUnique();
+            modelBuilder.Entity<Boleta>().HasIndex(x => x.Id).IsUnique();           
+            
+
         }
     }
 }

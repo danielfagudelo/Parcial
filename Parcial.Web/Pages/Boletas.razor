@@ -1,0 +1,226 @@
+﻿@page "/boletas"
+@using Parcial.Web.Shared.Entities;
+@inject IRepository repository
+@inject SweetAlertService sweetAlertService
+@inject NavigationManager navigationManager
+
+
+<div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+    <div class="mx-2">
+        <input style="width: 400px;" type="number" class="form-control" id="boleta" placeholder="Validar Boleta..." @bind="boleta" />
+    </div>
+    <div>
+        <button type="button" class="btn btn-outline-primary" @onclick="validateBoletaAsync">Validar</button>
+        <button hidden=@showSelect type="button" class="btn btn-primary" @onclick="Edit">Registrar </button>
+    </div>
+</div>
+
+<div hidden=@showSelect class="mb-3" style="margin-top: 20px;">
+    <label>Seleccione la porteria:</label>
+    <div>
+        <select @onchange="(e) => OptionChanged(e)">
+            <option value="Norte">Norte</option>
+            <option value="Sur">Sur</option>
+            <option value="Oriental">Oriental</option>
+            <option value="Occidental">Occidental</option>
+        </select>
+    </div>
+</div>
+
+<div hidden=@showNorte style="display: flex; flex-direction: column; align-items: center;">
+    <img src="/image/estadioNorte.png" style="width: 539px; height: 430px;">
+</div>
+
+<div hidden=@showSur style="display: flex; flex-direction: column; align-items: center;">
+    <img src="/image/estadioSur.png" style="width: 539px; height: 430px;">
+</div>
+
+<div hidden=@showOccidental style="display: flex; flex-direction: column; align-items: center;">
+    <img src="/image/estadioOccidental.png" style="width: 539px; height: 430px;">
+</div>
+
+<div hidden=@showOriental style="display: flex; flex-direction: column; align-items: center;">
+    <img src="/image/estadioOriental.png" style="width: 539px; height: 430px;">
+</div>
+
+<style>
+    select {
+        -webkit-appearance: none; /* Elimina el estilo de la plataforma */
+        -moz-appearance: none;
+        appearance: none;
+        background-color: #333; /* Color de fondo */
+        border: none; /* Borde sin estilo */
+        color: white; /* Color del texto */
+        font-size: 16px; /* Tamaño de fuente */
+        text-align-last: center; /* Centra el texto en la opción */
+        text-shadow: 0px 1px 1px #000; /* Agrega sombra al texto */
+        width: 200px; /* Ancho */
+        height: 50px;
+    }
+    /* Estilo de opción */
+    option {
+        background-color: #666; /* Color de fondo */
+        color: white; /* Color del texto */
+        font-size: 16px; /* Tamaño de fuente */
+        padding: 10px 20px; /* Espacio de relleno */
+        text-align: center; /* Centra el texto */
+        text-shadow: 0px 1px 1px #000; /* Agrega sombra al texto */
+    }
+        /* Estilo de opción seleccionada */
+        option:checked {
+            background-color: #4CAF50; /* Color de fondo */
+            color: white; /* Color del texto */
+            font-size: 16px; /* Tamaño de fuente */
+            text-align: center; /* Centra el texto */
+            text-shadow: 0px 1px 1px #000; /* Agrega sombra al texto */
+        }
+    /* Estilo de flecha */
+    select::after {
+        content: "\25BC"; /* Código Unicode de la flecha */
+        font-size: 16px; /* Tamaño de fuente */
+        position: absolute; /* Posición */
+        top: 50%; /* Alinea en la mitad vertical */
+        right: 10px; /* Alinea a la derecha */
+        transform: translateY(-50%); /* Centra verticalmente */
+    }
+</style>
+
+@code {
+    private string? selectedOption;
+    private bool showNorte = true;
+    private bool showSur = true;
+    private bool showOriental = true;
+    private bool showOccidental = true;
+    private bool showSelect = true;
+
+    public Boleta? ticketResponse { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string boleta { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        OptionChanged();
+    }
+
+    private void OptionChanged(ChangeEventArgs? e = null)
+    {
+        if (e != null)
+        {
+            selectedOption = e.Value?.ToString();
+        }
+
+        switch (selectedOption)
+        {
+            case "Norte":
+                showNorte = false;
+                showSur = true;
+                showOriental = true;
+                showOccidental = true;
+                break;
+
+            case "Sur":
+                showNorte = true;
+                showSur = false;
+                showOriental = true;
+                showOccidental = true;
+                break;
+
+            case "Oriental":
+                showNorte = true;
+                showSur = true;
+                showOriental = false;
+                showOccidental = true;
+                break;
+
+            case "Occidental":
+                showNorte = true;
+                showSur = true;
+                showOriental = true;
+                showOccidental = false;
+                break;
+
+            default:
+                showNorte = true;
+                showSur = true;
+                showOriental = true;
+                showOccidental = true;
+                break;
+        }
+
+    }
+
+    private async Task validateBoletaAsync()
+    {
+        if (string.IsNullOrEmpty(boleta))
+        {
+            clearVar();
+            await sweetAlertService.FireAsync("Error", "Primero debes ingresar un boleta", SweetAlertIcon.Error);
+        }
+        else
+        {
+            var responseHTTP = await repository.Get<Boleta>($"/api/boletas/{boleta}");
+            if (responseHTTP.Error)
+            {
+                if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    clearVar();
+                    await sweetAlertService.FireAsync("Error", "Boleta no válida", SweetAlertIcon.Error);
+                }
+                else
+                {
+                    var mensajeError = await responseHTTP.GetErrorMessageAsync();
+                    await sweetAlertService.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+                }
+            }
+            else
+            {
+                ticketResponse = responseHTTP.Response!;
+                if (ticketResponse.FueUsada)
+                {
+                    clearVar();
+                    boleta = "";
+                    string messege = $"La boleta ya fue usada el dia {ticketResponse.FechaUso} por la porteria {ticketResponse.Porteria}";
+                    await sweetAlertService.FireAsync("Lo sentimos!", messege, SweetAlertIcon.Warning);
+                }
+                else
+                {
+                    showSelect = false;
+                    OptionChanged();
+                }
+            }
+        }
+
+    }
+
+
+    private async Task Edit()
+    {
+        ticketResponse.FechaUso = DateTime.Now;
+        ticketResponse.Porteria = selectedOption;
+        ticketResponse.FueUsada = true;
+        var responseHTTP = await repository.Put("/api/boletas", ticketResponse);
+
+        if (responseHTTP.Error)
+        {
+            var mensajeError = await responseHTTP.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+        }
+        else
+        {
+            clearVar();
+            boleta = "";
+            await sweetAlertService.FireAsync("Bien...!", "Puedes ingresar al estadio", SweetAlertIcon.Success);
+        }
+    }
+
+    private void clearVar()
+    {
+        showNorte = true;
+        showSur = true;
+        showOriental = true;
+        showOccidental = true;
+        showSelect = true;
+    }
+}
